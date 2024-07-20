@@ -3,7 +3,7 @@
   "_edgeDefinitions": "(EdgeDefinition('Action2',fromCollections=[NodeId],toCollections=[NodeId]),)",
 
   "queryBFS_DFS": {
-    "depth": 10,
+    "depth": 15,
     "startVertex": "NodeId/1086292",
     "fieldName" : "empty",
     "value" : 0

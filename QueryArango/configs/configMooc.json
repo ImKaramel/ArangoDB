@@ -32,7 +32,7 @@
   },
 
   "queryTriangles": {
-    "collection": "User"
+    "startVertex": "User/6956"
   },
 
   "Action": {

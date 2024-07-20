@@ -1,10 +1,10 @@
 import json
 import sys
 import requests
-from pyArango.connection import *
+# from pyArango.connection import *
 
 
-path = "/Users/assistentka_professora/Desktop/ArangoDB/Practice_ArangoDB-/QueryArango/"
+path = "/Users/assistentka_professora/Desktop/ArangoDB/ArangoDB/QueryArango/"
 
 class ArangoDBQuery:
     def __init__(self):
@@ -243,18 +243,20 @@ class ArangoDBQuery:
             print(f"Ошибка при выполнении запроса queryFilterSum: {response.text}")
 
     def queryTriangles(self, graph, startVertex):
+
         headers = {'Content-Type': 'application/json'}
         data = {
             'query': f'''
 
         FOR v, e, p IN 3..3 ANY '{startVertex}' GRAPH {graph}
-                    FILTER p.vertices[-1]._id == p.vertices[0]._id
+                    FILTER  p.vertices[0]._id == p.vertices[-1]._id
                     RETURN  {{'p': p.vertices[*]._id, 'e': p.edges[*]}}
 
             '''
         }
 
         response = requests.post(self.endpoint, headers=headers, json=data, auth=self.auth)
+
         if response.status_code == 201:
             result = response.json()['result']
 
@@ -274,12 +276,12 @@ class ArangoDBQuery:
 
 
 if __name__ == "__main__":
-    config_path = sys.argv[1]
+    #config_path = sys.argv[1]
 
-    #config_path = "/Users/assistentka_professora/Desktop/ArangoDB/Practice_ArangoDB-/QueryArango/configs/configElliptic.json"
-    #config_path = "/Users/assistentka_professora/Desktop/ArangoDB/Practice_ArangoDB-/QueryArango/configs/configMooc.json"
-    #config_path = "/Users/assistentka_professora/Desktop/ArangoDB/Practice_ArangoDB-/QueryArango/configs/configRoadNet.json"
-    #config_path = "/Users/assistentka_professora/Desktop/ArangoDB/Practice_ArangoDB-/QueryArango/configs/configStableCoin.json"
+    #config_path = "/Users/assistentka_professora/Desktop/ArangoDB/ArangoDB/QueryArango/configs/configElliptic.json"
+    #config_path = "/Users/assistentka_professora/Desktop/ArangoDB/ArangoDB/QueryArango/configs/configMooc.json"
+    config_path = "/Users/assistentka_professora/Desktop/ArangoDB/ArangoDB/QueryArango/configs/configRoadNet.json"
+    #config_path = "/Users/assistentka_professora/Desktop/ArangoDB/ArangoDB/QueryArango/configs/configStableCoin.json"
 
 
     with open(config_path, "r") as f:
@@ -315,7 +317,8 @@ if __name__ == "__main__":
                                                           config["queryFilterSum"]["value"],
                                                           config["queryFilterSum"]["sumValue"])
 
-    resultQueryTriangles = Query.queryTriangles(graph_name, config["queryTriangles"]["startVertex"])
+
+    # resultQueryTriangles = Query.queryTriangles(graph_name, config["queryTriangles"]["startVertex"])
 
 # data = {
 #     'query': f'''
