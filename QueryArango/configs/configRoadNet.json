@@ -37,6 +37,12 @@
     "startVertex": "NodeId/1210809"
   },
 
+  "queryShortPath": {
+    "fromVertex": "NodeId/1518143",
+    "toVertex": "NodeId/1517205"
+
+  },
+
     "Action": {
         "_fields": {
         }

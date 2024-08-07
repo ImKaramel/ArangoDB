@@ -7,11 +7,12 @@
     "fieldName" : "size",
     "value" : 85832
   },
+
   "queryFilterExtended": {
     "collection": "txId",
     "edge":  "Action3",
     "fieldName" : "size",
-    "value" : 3000,
+    "value" : 85832,
     "degree": 12
   },
 
@@ -32,6 +33,11 @@
 
   "queryTriangles": {
     "startVertex": "txId/230593839"
+  },
+
+  "queryShortPath": {
+    "fromVertex": "txId/10853450",
+    "toVertex": "txId/157642505"
   },
 
   "Action3": "",

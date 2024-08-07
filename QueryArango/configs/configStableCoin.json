@@ -18,19 +18,24 @@
     "depth": 8,
     "startVertex": "Address/0x4f2c813dc8078a9ea7884ff287c0176603e7d1db",
     "fieldName" : "value",
-    "value" : 0
+    "value" : 493112
   },
 
   "queryFilterSum": {
     "collection": "Address",
     "action": "Action4",
     "fieldName" : "value",
-    "value" : 80000,
+    "value" : 300000,
     "sumValue": 493112.608952
   },
 
   "queryTriangles": {
     "startVertex": "Address/0x46c47b6c38ba5a477a5b7db984fd5d8b3b14961f"
+  },
+
+  "queryShortPath": {
+    "fromVertex": "Address/0x5f407a10e031c0f4b6c2286089023b01267bb01c",
+    "toVertex": "Address/0x2027a4a5884d7c511dfb542d5c68650471564215"
   },
 
     "Action4" : {

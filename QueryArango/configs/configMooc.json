@@ -4,7 +4,7 @@
 
   "queryBFS_DFS": {
     "depth": 1,
-    "startVertex": "User/6956",
+    "startVertex": "User/6725",
     "fieldName" : "timestamp",
     "value" : 2571264.000
   },
@@ -27,12 +27,17 @@
     "collection": "User",
     "action": "Action",
     "fieldName" : "timestamp",
-    "value" : 100000,
-    "sumValue": 598165819
+    "value" : 2571264
+
   },
 
   "queryTriangles": {
     "startVertex": "User/6956"
+  },
+
+  "queryShortPath": {
+    "fromVertex": "User/1783",
+    "toVertex": "Target/6"
   },
 
   "Action": {
