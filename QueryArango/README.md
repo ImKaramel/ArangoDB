@@ -1,14 +1,10 @@
 ## ArangoDB Query 
 
-## Installation
-```bash
-pip install pyArango
-```
 
 ## Запуск
 
-Приведен в run.sh, на вход подается путь к конфигурации в формате json (, в котором записаны необходимые значения 
-Также, в нем можно найти описание коллекций графа
+Приведен в run.sh, на вход подается путь к конфигурации в формате json из папки configs/config..)
+В данной конфигурации записываются необходимые параметры для каждого запроса.
 
 ```sh
 python3 main.py "/path_to_config/configMooc.json"
@@ -83,7 +79,7 @@ json данных запросов:
         """)
 ```
 
-## queryFilterExtended 
+### queryFilterExtended 
 
 это запрос, который выполняет более сложный запрос на фильтрацию в заданной коллекции в базе данных. Он принимает следующие параметры:
 - collection: имя коллекции, которая будет искаться
@@ -112,7 +108,7 @@ json данных запросов:
         """
 ```
 
- ## queryFilterSum
+ ### queryFilterSum
 
 Запрос фильтрует документы на основе определенного значения поля и вычисляет сумму другого поля для отфильтрованных документов.
  Затем он возвращает вершину и общую сумму. 
@@ -121,7 +117,7 @@ json данных запросов:
 - action - название коллекции ребер, которые будут использоваться в запросе. 
 - fieldName - имя поля, по которому будет производиться фильтрация документов.
 - value - значение, по которому будут фильтроваться документы.
-- sumValue - значение, по которому будет фильтроваться сумма поля.
+- sumValue - значение, по которому будет фильтроваться сумма поля (не добавлено).
 
  ```json
    "queryFilterSum": {
@@ -142,24 +138,55 @@ json данных запросов:
                 RETURN e.{fieldName}
              )
             LET totalSum = SUM(sum)
-            FILTER totalSum > {sumValue}
+            # FILTER totalSum > {sumValue}
         RETURN {{ vertex: v, sum: totalSum }}
         """
 ```
 
 
-## queryTriangles
+### queryTriangles
 
 Он находит все треугольники в графе, начиная с заданной вершины. Треугольник определяется как набор из трех вершин, соединенных ребрами.
 Метод возвращает количество найденных треугольников и список треугольников. 
 
 - graph - имя графа, на который будет выполнен запрос.
-- startVertex - начальная вершина, с которой начнется поиск треугольников в графе.
+- action - название коллекции ребер, которые будут использоваться в запросе.
+- collection - имя коллекции, на которую будет выполнен запрос.
 
-```json
-    "queryTriangles": {
-    "startVertex": "User/42"
-  },
+
+```aql
+            WITH {action}, {collection}
+                LET triangles = (
+                 FOR suspicous_account IN {collection}
+                    FOR acct, tx, path IN 3..3 ANY suspicous_account._id GRAPH {graph}
+                        PRUNE tx._to == suspicous_account._id
+                        FILTER tx._to == suspicous_account._id OR tx._from == suspicous_account._id
+                        LET newPath = SLICE(path.vertices, 0, LENGTH(path.vertices) - 1)
+                        LET sortedPath = (
+                            FOR v IN newPath
+                                SORT v._id ASC
+                            RETURN v
+                            )
+
+                    RETURN DISTINCT {{"1": sortedPath[0]._id, "2": sortedPath[1]._id, "3": sortedPath[2]._id }}
+                    )
+            RETURN {{"Amount": LENGTH(triangles) ,"triangles": triangles}}
 ```
 
- 
+### Функция queryShortPath
+
+Эта функция предназначена для выполнения запроса к графу, чтобы найти кратчайший путь между двумя вершинами.
+
+- graph: Имя графа, в котором будет выполняться запрос.
+- fromVertex: Ключ (ID) начальной вершины, от которой начинается поиск.
+- toVertex: Ключ (ID) конечной вершины, к которой ведет поиск.
+
+```python
+            'query': f'''
+            
+                FOR v, e IN OUTBOUND SHORTEST_PATH '{fromVertex}' TO '{toVertex}' GRAPH '{graph}'
+                OPTIONS {{ useCache: false}} 
+                        RETURN [v._key, e._key]
+                                '''
+        
+```

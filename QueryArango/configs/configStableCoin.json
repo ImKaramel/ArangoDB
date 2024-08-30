@@ -30,7 +30,8 @@
   },
 
   "queryTriangles": {
-    "startVertex": "Address/0x46c47b6c38ba5a477a5b7db984fd5d8b3b14961f"
+    "action": "Action4",
+    "collection": "Address"
   },
 
   "queryShortPath": {

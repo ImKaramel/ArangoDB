@@ -32,7 +32,8 @@
   },
 
   "queryTriangles": {
-    "startVertex": "User/6956"
+    "action": "Action",
+    "collection": "Target"
   },
 
   "queryShortPath": {

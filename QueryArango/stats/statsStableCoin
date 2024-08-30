@@ -1,50 +1,30 @@
 queryFilter
-10.911133 Kb
-0.027160 s
-
-
-queryBFS
-32.653320 Kb
-0.005889 s
-
-
-queryDFS
-32.708008 Kb
-0.004720 s
-
-
-queryFilterSum
-63.942383 Kb
-3502.704748 s
-
-
-queryShortPath
-354.351562 Kb
-1.641140 s
+32.000000 Kb
+0.438476 s
 
 
 queryFilterExtended
-67.112305 Kb
-450.183318 s
+38400.000000 Kb
+3612.389102 s
 
 
 queryBFS
-10.665039 Kb
-0.023163 s
+64.000000 Kb
+0.093449 s
 
 
 queryDFS
-26.375000 Kb
-0.004577 s
+64.000000 Kb
+0.000368 s
 
 
-queryBFS
-10.665039 Kb
-0.011157 s
+queryFilterSum
+254400.000000 Kb
+2718.542348 s
 
 
-queryDFS
-26.375000 Kb
-0.005445 s
+queryShortPath
+15392.000000 Kb
+1.749906 s
 
 

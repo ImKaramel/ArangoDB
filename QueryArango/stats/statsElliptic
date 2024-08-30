@@ -1,40 +1,35 @@
 queryFilter
-28.472656 Kb
-0.213666 s
+96.000000 Kb
+0.208429 s
 
 
 queryFilterExtended
-284.287109 Kb
-4.781357 s
+640.000000 Kb
+2.376625 s
 
 
 queryBFS
-285.098633 Kb
-0.008803 s
+64.000000 Kb
+0.001429 s
 
 
 queryDFS
-285.862305 Kb
-0.004760 s
+64.000000 Kb
+0.000598 s
 
 
 queryFilterSum
-286.571289 Kb
-0.253495 s
+7040.000000 Kb
+0.220302 s
 
 
 queryShortPath
-577.100586 Kb
-0.006219 s
+64.000000 Kb
+0.000516 s
 
 
-queryBFS
-10.911133 Kb
-0.025530 s
-
-
-queryDFS
-26.312500 Kb
-0.005509 s
+queryTriangles
+6016.000000 Kb
+47.588817 s
 
 

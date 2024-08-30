@@ -32,9 +32,8 @@
   },
 
   "queryTriangles": {
-    "collection" : "NodeId",
-    "startVertex2": "NodeId/1086292",
-    "startVertex": "NodeId/1210809"
+    "action": "Action2",
+    "collection": "NodeId"
   },
 
   "queryShortPath": {

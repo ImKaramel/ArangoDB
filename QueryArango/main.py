@@ -16,10 +16,10 @@ class ArangoDBQuery:
         self.auth = (self.username, self.password)
         self.endpoint = f'{self.url}/_db/{self.db_name}/_api/cursor'
 
-    def getStats(self, graph, nameQuery, time, memory):
-    # def getStats(self, graph, nameQuery, explanation):
-        # time = explanation["stats"]["executionTime"]
-        # memory = explanation["stats"]["peakMemoryUsage"]
+    # def getStats(self, graph, nameQuery, time, memory):
+    def getStats(self, graph, nameQuery, explanation):
+        time = explanation["stats"]["executionTime"]
+        memory = explanation["stats"]["peakMemoryUsage"] / 1024
 
         with open(path + "stats/stats" + graph, "a") as file:
             file.write(nameQuery + "\n")
@@ -27,27 +27,27 @@ class ArangoDBQuery:
             file.write("" + "{:.6f}".format(memory) + " Kb" + "\n")
             file.write("{:.6f}".format(time) + " s" + "\n\n\n")
 
-#_timestamp
     def queryFilter(self, graph, collection, fieldName, value):
         headers = {'Content-Type': 'application/json'}
         data = {'query':
                     f'''FOR v IN {collection} 
-                        OPTIONS {{useCache: false, useIndex: "_{fieldName}"}} 
+                        OPTIONS {{useCache: false}} 
                         FILTER v.{fieldName} >= {value} 
                         RETURN {{"id": v._key, "{fieldName}": v.{fieldName}
                         }}''',
                 }
-        start_time = time.time()
-        tracemalloc.start()
+        #start_time = time.time()
+        # tracemalloc.start()
         response = requests.post(self.endpoint, headers=headers, json=data, auth=self.auth)
-        end_time = time.time()
-        snapshot = tracemalloc.take_snapshot()
-        top_stats = snapshot.statistics('lineno')
+        # end_time = time.time()
+        # snapshot = tracemalloc.take_snapshot()
+        # top_stats = snapshot.statistics('lineno')
         if response.status_code == 201:
             result = response.json()['result']
-            self.getStats(graph, "queryFilter", end_time - start_time, top_stats[0].size / 1024)
-            # extra = response.json()['extra']
-            # self.getStats(graph, "queryFilter", extra)
+            #self.getStats(graph, "queryFilter", end_time - #start_time, top_stats[0].size / 1024)
+            extra = response.json()['extra']
+            print(extra)
+            self.getStats(graph, "queryFilter", extra)
             with open(f"results/results{graph}/queryFilter.json", "w") as file:
                 json.dump(result, file, indent=4)
 
@@ -84,18 +84,18 @@ class ArangoDBQuery:
                     RETURN  {{'vertex':v._key, '{param}': p.edges[*].{param}}}
                 '''
             }
-        start_time = time.time()
-        tracemalloc.start()
+        # start_time = time.time()
+        # tracemalloc.start()
         response = requests.post(self.endpoint, headers=headers, json=data, auth=self.auth)
 
-        end_time = time.time()
-        snapshot = tracemalloc.take_snapshot()
-        top_stats = snapshot.statistics('lineno')
+        # end_time = time.time()
+        # snapshot = tracemalloc.take_snapshot()
+        # top_stats = snapshot.statistics('lineno')
         if response.status_code == 201:
             result = response.json()['result']
-            self.getStats(graph, "queryBFS", end_time - start_time, top_stats[0].size / 1024)
-            # extra = response.json()['extra']
-            # self.getStats(graph, "queryBFS", extra)
+            #self.getStats(graph, "queryBFS", end_time - start_time, top_stats[0].size / 1024)
+            extra = response.json()['extra']
+            self.getStats(graph, "queryBFS", extra)
             with open(f"results/results{graph}/queryBFS.json", "w") as file:
                 json.dump(result, file, indent=4)
             return result
@@ -110,7 +110,7 @@ class ArangoDBQuery:
             data = {
                 'query': f'''
                             FOR v, e, p IN 1..{depth} OUTBOUND "{startVertex}" GRAPH {graph}
-                            OPTIONS {{"order": "dfs", useCache: false, useIndex: "_{param}"}} 
+                            OPTIONS {{"order": "dfs", useCache: false}} 
                             FILTER  (p.vertices[*].{param} ALL >= {value})
                             RETURN  {{'vertex':v._key, '{param}': p.vertices[*].{param}}}
                         '''
@@ -127,23 +127,23 @@ class ArangoDBQuery:
             data = {
                 'query': f'''
                     FOR v, e, p IN 1..{depth} OUTBOUND "{startVertex}" GRAPH {graph}
-                    OPTIONS {{"order": "dfs", useCache: false, useIndex: "_{param}"}} 
+                    OPTIONS {{"order": "dfs", useCache: false}} 
                     FILTER (p.edges[*].{param} ALL > {value})
                     RETURN  {{'vertex':v._key, '{param}': p.edges[*].{param}}}
                 '''
             }
-        start_time = time.time()
-        tracemalloc.start()
+        # start_time = time.time()
+        # tracemalloc.start()
         response = requests.post(self.endpoint, headers=headers, json=data, auth=self.auth)
 
         end_time = time.time()
-        snapshot = tracemalloc.take_snapshot()
-        top_stats = snapshot.statistics('lineno')
+        # snapshot = tracemalloc.take_snapshot()
+        # top_stats = snapshot.statistics('lineno')
         if response.status_code == 201:
             result = response.json()['result']
-            self.getStats(graph, "queryDFS", end_time - start_time, top_stats[0].size / 1024)
-            # extra = response.json()['extra']
-            # self.getStats(graph, "queryDFS", extra)
+            #self.getStats(graph, "queryDFS", end_time - start_time, top_stats[0].size / 1024)
+            extra = response.json()['extra']
+            self.getStats(graph, "queryDFS", extra)
 
             with open(f"results/results{graph}/queryDFS.json", "w") as file:
                 json.dump(result, file, indent=4)
@@ -157,7 +157,7 @@ class ArangoDBQuery:
             data = {
                 'query': f'''
                     FOR vertex IN {collection}
-                    OPTIONS {{ useCache: false, useIndex: "_{fieldName}"}} 
+                    OPTIONS {{ useCache: false}} 
                          LET degree = LENGTH((FOR v, e IN 1..1 OUTBOUND vertex {action} 
                             FILTER v.{fieldName} >= {value} RETURN 1))
                          FILTER degree >= {degree}
@@ -178,7 +178,7 @@ class ArangoDBQuery:
             data = {
                 'query': f'''
                            FOR vertex IN {collection}
-                           OPTIONS {{ useCache: false, useIndex: "_{fieldName}"}} 
+                           OPTIONS {{ useCache: false}} 
                                LET degree = LENGTH((FOR v, e IN 1..1 OUTBOUND vertex {action} 
                                    FILTER e.{fieldName} >= {value} RETURN 1))
                                FILTER degree >= {degree}
@@ -186,19 +186,19 @@ class ArangoDBQuery:
                        '''
             }
 
-        start_time = time.time()
-        tracemalloc.start()
+        # start_time = time.time()
+        # tracemalloc.start()
         response = requests.post(self.endpoint, headers=headers, json=data, auth=self.auth)
-        end_time = time.time()
-        snapshot = tracemalloc.take_snapshot()
-        top_stats = snapshot.statistics('lineno')
+        # end_time = time.time()
+        # snapshot = tracemalloc.take_snapshot()
+        # top_stats = snapshot.statistics('lineno')
         if response.status_code == 201:
             result = response.json()['result']
             with open(f"results/results{graph}/queryFilterExtended.json", "w") as file:
                 json.dump(result, file, indent=4)
-            self.getStats(graph, "queryFilterExtended", end_time - start_time, top_stats[0].size / 1024)
-            # explanation = response.json()['extra']
-            # self.getStats(graph, "queryFilterExtended", explanation)
+            #self.getStats(graph, "queryFilterExtended", end_time - start_time, top_stats[0].size / 1024)
+            explanation = response.json()['extra']
+            self.getStats(graph, "queryFilterExtended", explanation)
 
             return result
         else:
@@ -210,7 +210,7 @@ class ArangoDBQuery:
             data = {
                 'query': f'''
                         FOR v IN {collection}
-                        OPTIONS {{ useCache: false, useIndex: "_{fieldName}"}} 
+                        OPTIONS {{ useCache: false}} 
                             LET sum = (
                                 FOR neighbor, e IN 1..1 OUTBOUND v._key {action}
                                     FILTER neighbor.{fieldName} > {value}
@@ -238,12 +238,12 @@ class ArangoDBQuery:
                     '''
             }
 
-        start_time = time.time()
-        tracemalloc.start()
+        # start_time = time.time()
+        # tracemalloc.start()
         response = requests.post(self.endpoint, headers=headers, json=data, auth=self.auth)
-        end_time = time.time()
-        snapshot = tracemalloc.take_snapshot()
-        top_stats = snapshot.statistics('lineno')
+        # end_time = time.time()
+        # snapshot = tracemalloc.take_snapshot()
+        # top_stats = snapshot.statistics('lineno')
         if response.status_code == 201:
             result = response.json()['result']
 
@@ -255,23 +255,36 @@ class ArangoDBQuery:
                     json.dump("None", file, indent=4)
 
 
-            self.getStats(graph, "queryFilterSum", end_time - start_time, top_stats[0].size / 1024)
-            # explanation = response.json()['extra']
-            # self.getStats(graph, "queryFilterSum", explanation)
+            # self.getStats(graph, "queryFilterSum", end_time - start_time, top_stats[0].size / 1024)
+            explanation = response.json()['extra']
+            self.getStats(graph, "queryFilterSum", explanation)
 
             return result
         else:
             print(f"Ошибка при выполнении запроса queryFilterSum: {response.text}")
 
-    def queryTriangles(self, graph, startVertex):
+    def queryTriangles(self, graph, action, collection):
 
         headers = {'Content-Type': 'application/json'}
+
         data = {
             'query': f'''
-
-        FOR v, e, p IN 3..3 ANY '{startVertex}' GRAPH {graph}
-                    FILTER  p.vertices[0]._id == p.vertices[-1]._id
-                    RETURN  {{'p': p.vertices[*]._id, 'e': p.edges[*]}}
+            WITH {action}, {collection}
+            LET triangles = (
+               FOR suspicous_account IN {collection}
+                    FOR acct, tx, path IN 3..3 ANY suspicous_account._id GRAPH {graph}
+                        PRUNE tx._to == suspicous_account._id 
+                        FILTER tx._to == suspicous_account._id OR tx._from == suspicous_account._id
+                        LET newPath = SLICE(path.vertices, 0, LENGTH(path.vertices) - 1)
+                        LET sortedPath = (
+                            FOR v IN newPath
+                                SORT v._id ASC
+                                RETURN v
+                            )
+                    
+                    RETURN DISTINCT {{"1": sortedPath[0]._id, "2": sortedPath[1]._id, "3": sortedPath[2]._id }}
+                    )
+            RETURN {{"Amount": LENGTH(triangles)  }}
 
             '''
         }
@@ -302,12 +315,12 @@ class ArangoDBQuery:
                                 '''
         }
 
-        start_time = time.time()
-        tracemalloc.start()
+        # start_time = time.time()
+        # tracemalloc.start()
         response = requests.post(self.endpoint, headers=headers, json=data, auth=self.auth)
-        end_time = time.time()
-        snapshot = tracemalloc.take_snapshot()
-        top_stats = snapshot.statistics('lineno')
+        # end_time = time.time()
+        # snapshot = tracemalloc.take_snapshot()
+        # top_stats = snapshot.statistics('lineno')
         if response.status_code == 201:
             result = response.json()['result']
 
@@ -318,9 +331,9 @@ class ArangoDBQuery:
                 with open(f"results/results{graph}/queryShortPath.json", 'w') as file:
                     json.dump("None", file, indent=4)
                 print("Результаты запроса отсутствуют.")
-            self.getStats(graph, "queryShortPath", end_time - start_time, top_stats[0].size / 1024)
-            # explanation = response.json()['extra']
-            # self.getStats(graph, "queryShortPath", explanation)
+            # self.getStats(graph, "queryShortPath", end_time - start_time, top_stats[0].size / 1024)
+            explanation = response.json()['extra']
+            self.getStats(graph, "queryShortPath", explanation)
 
             return result
         else:
@@ -340,19 +353,19 @@ if __name__ == "__main__":
     graph_name = config["graphName"]
     Query = ArangoDBQuery()
 
-    # with open(path + "stats/stats" + graph_name, 'w') as file:
-    #     pass
+    with open(path + "stats/stats" + graph_name, 'w') as file:
+        pass
 
-    # resultQueryFilter = Query.queryFilter(graph_name, config["queryFilter"]["collection"],
-    #                                       config["queryFilter"]["fieldName"], config["queryFilter"]["value"])
+    resultQueryFilter = Query.queryFilter(graph_name, config["queryFilter"]["collection"],
+                                          config["queryFilter"]["fieldName"], config["queryFilter"]["value"])
 
 
-    # resultQueryFilterExtended = Query.queryFilterExtended(graph_name,
-    #                                                       config["queryFilterExtended"]["collection"],
-    #                                                       config["queryFilterExtended"]["edge"],
-    #                                                       config["queryFilterExtended"]["fieldName"],
-    #                                                       config["queryFilterExtended"]["value"],
-    #                                                       config["queryFilterExtended"]["degree"])
+    resultQueryFilterExtended = Query.queryFilterExtended(graph_name,
+                                                          config["queryFilterExtended"]["collection"],
+                                                          config["queryFilterExtended"]["edge"],
+                                                          config["queryFilterExtended"]["fieldName"],
+                                                          config["queryFilterExtended"]["value"],
+                                                          config["queryFilterExtended"]["degree"])
 
 
     resultQueryBFS = Query.queryBFS(graph_name, config["queryBFS_DFS"]["depth"], config["queryBFS_DFS"]["startVertex"],
@@ -376,25 +389,12 @@ if __name__ == "__main__":
                                                 config["queryShortPath"]["toVertex"],
                                                 )
 
-    #resultQueryTriangles = Query.queryTriangles(graph_name, config["queryTriangles"]["startVertex"])
+    # resultQueryTriangles = Query.queryTriangles("Test", "action5", "test")
 
-# data = {
-#     'query': f'''
-#         LET triangles = (
-#             FOR v IN {collection}
-#                 FOR w, e1 IN 1..1 ANY v GRAPH {graph}
-#                     FOR x, e2 IN 1..1 ANY w GRAPH {graph}
-#                         FILTER x._id != v._id
-#                         LET triangle = [v._id, w._id, x._id]
-#                         LET sortedTriangle = SORTED(triangle)
-#                         RETURN {{ v: sortedTriangle[0], w: sortedTriangle[1], x: sortedTriangle[2] }}
-#             )
-#         RETURN  {{
-#             'triangles': triangles,
-#             'count': LENGTH(triangles)
-#         }}
-#     '''
-# }
+    resultQueryTriangles = Query.queryTriangles(graph_name, config["queryTriangles"]["action"], config["queryTriangles"]["collection"])
+
+
+
 
 
 #docker run -d --name scylladb -p 9042:9042 -v /Users/assistentka_professora/Desktop/Scylla/var/lib/scylla:/var/lib/scylla scylladb/scylla --smp 1

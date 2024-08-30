@@ -32,7 +32,8 @@
   },
 
   "queryTriangles": {
-    "startVertex": "txId/230593839"
+    "action": "Action3",
+    "collection": "txId"
   },
 
   "queryShortPath": {
